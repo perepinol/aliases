@@ -1,0 +1,4 @@
+alias.s=status
+alias.tree=log --graph --pretty=short --all
+alias.summary=log --graph --oneline --all --decorate
+alias.alias=! git config --get-regexp ^alias\. | sed -e s/^alias\.// -e s/\ /\ =\ /
