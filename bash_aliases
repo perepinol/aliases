@@ -5,6 +5,11 @@ alias c='clear'
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias hg='history | grep '
+function mcd() {
+	mkdir $1
+	cd $1
+}
 
 echo "**************************** git aliases *****************************" > /dev/null
 
