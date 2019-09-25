@@ -10,6 +10,9 @@ function mcd() {
 	mkdir $1
 	cd $1
 }
+function ensudo() {
+    sudo $(history | tail -n 2 | head -n 1 | awk '{$1=""}1')
+}
 
 echo "**************************** git aliases *****************************" > /dev/null
 
