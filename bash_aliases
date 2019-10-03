@@ -25,7 +25,33 @@ alias gsum='git summary'
 
 echo "************************* virtualenv aliases *************************" > /dev/null
 
-alias virtualenv='python3 -m venv'
+function virtualenv() {
+	if [ $# -eq 0 ]; then
+		echo "Usage: virtualenv [-v <python version>] ENV_DIR"
+		return 0
+	fi
+	
+	VERSION=3
+	
+	while [ $# -gt 0 ]; do
+		key="$1"
+		case $key in
+			-v|--version)
+			VERSION="$2"
+			shift
+			shift
+			;;
+			
+			*)
+			ENV_DIR="$1"
+			shift
+			;;
+		esac
+	done
+		
+	command="python$VERSION -m venv $ENV_DIR"
+	$command
+}
 alias deact='deactivate'
 function activate() {
 	original_dir=$(pwd)
