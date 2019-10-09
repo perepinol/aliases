@@ -1,4 +1,4 @@
-echo "************************** general aliases ***************************" > /dev/null
+#************************** general aliases ***************************
 
 alias sdn='sudo shutdown now'
 alias c='clear'
@@ -14,7 +14,7 @@ function ensudo() {
     sudo $(history | tail -n 2 | head -n 1 | awk '{$1=""}1')
 }
 
-echo "**************************** git aliases *****************************" > /dev/null
+# **************************** git aliases *****************************
 
 alias gs='git status'
 alias gt='git tree'
@@ -23,7 +23,7 @@ alias gc='git commit -m'
 alias gp='git push origin master'
 alias gsum='git summary'
 
-echo "************************* virtualenv aliases *************************" > /dev/null
+# ************************* virtualenv aliases *************************
 
 function virtualenv() {
 	if [ $# -eq 0 ]; then
