@@ -11,7 +11,9 @@ function mcd() {
 	cd $1
 }
 function ensudo() {
-    sudo $(history | tail -n 2 | head -n 1 | awk '{$1=""}1')
+    command=$(history | tail -n 2 | head -n 1 | awk '{$1=""}1')
+    echo "sudo$command"
+    sudo $command
 }
 
 # **************************** git aliases *****************************
