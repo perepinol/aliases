@@ -6,6 +6,13 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias hg='history | grep '
+function process() {
+    ps -ef | awk -v search="$1" '
+    /^UID/ { print $0 }
+    {
+        if ($8 ~ search) print $0
+    }'
+}
 function mcd() {
 	mkdir $1
 	cd $1
