@@ -2,6 +2,7 @@
 
 alias sdn='sudo shutdown now'
 alias c='clear'
+alias explorer='xdg-open'
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
@@ -29,7 +30,7 @@ alias gs='git status'
 alias gt='git tree'
 alias ga='git add'
 alias gc='git commit -m'
-alias gp='git push origin master'
+alias gp='git push origin $(git branch | awk "/^\*/ {print \$2}")'
 alias gsum='git summary'
 
 # ************************* virtualenv aliases *************************
