@@ -30,8 +30,12 @@ alias gs='git status'
 alias gt='git tree'
 alias ga='git add'
 alias gc='git commit -m'
-alias gp='git push origin $(git branch | awk "/\\^\\\*/ {print \$2}")'
 alias gsum='git summary'
+function gp() {
+    branch=$(git branch | awk '/^\\\*/ {print \$2}')
+    echo "Push to $branch"
+    git push origin "$branch"
+}
 
 # ************************* virtualenv aliases *************************
 
