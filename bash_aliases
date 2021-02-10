@@ -7,6 +7,13 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias hg='history | grep '
+
+function hgr() {
+    command=$(history | tail -n +2 | grep "$1" | grep -v hgr | grep -v hg | awk '{$1=""}1' | tail -n 1)
+    echo "$command"
+    $command
+}
+
 function process() {
     ps -ef | awk -v search="$1" '
     /^UID/ { print $0 }
