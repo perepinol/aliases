@@ -43,6 +43,11 @@ function gp() {
     echo "Push to $branch"
     git push origin "$branch"
 }
+function gpf() {
+    branch=$(git branch | awk '/^\\\*/ {print \$2}')
+    echo "Push to $branch (FORCED)"
+    git push origin "$branch" --force
+}
 
 # ************************* virtualenv aliases *************************
 
