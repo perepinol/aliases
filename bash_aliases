@@ -37,6 +37,7 @@ alias gs='git status'
 alias gt='git tree'
 alias ga='git add'
 alias gc='git commit -m'
+alias gca='git commit --amend --no-edit'
 alias gsum='git summary'
 function gp() {
     branch=$(git branch | awk '/^\\\*/ {print \$2}')
