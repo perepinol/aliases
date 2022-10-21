@@ -6,14 +6,19 @@ alias explorer='xdg-open'
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias hg='history | grep '
+alias h='history'
+alias hg='history | grep'
+alias d='docker'
+alias dc='docker-compose'
 
+# Runs last instance of the command in the history that starts with the given args
 function hgr() {
-    command=$(history | tail -n +2 | grep "$1" | grep -v hgr | grep -v hg | awk '{$1=""}1' | tail -n 1)
+    command=$(history | tail -n +2 | grep "$*" | grep -v hgr | grep -v hg | awk '{$1=""}1' | tail -n 1)
     echo "$command"
     $command
 }
 
+# Find process IDs by name
 function process() {
     ps -ef | awk -v search="$1" '
     /^UID/ { print $0 }
@@ -21,10 +26,13 @@ function process() {
         if ($8 ~ search) print $0
     }'
 }
+
 function mcd() {
 	mkdir $1
 	cd $1
 }
+
+# Run the last command in the history with `sudo`
 function ensudo() {
     command=$(history | tail -n 2 | head -n 1 | awk '{$1=""}1')
     echo "sudo$command"
@@ -79,16 +87,23 @@ function virtualenv() {
 	command="python$VERSION -m venv $ENV_DIR"
 	$command
 }
+
 alias deact='deactivate'
+
+# Navigates directories towards the root while looking for the virtualenv passed as parameter.
+# Activates it if found
 function activate() {
-	original_dir=$(pwd)
-	if ! [ -z $1 ]; then
-		cd "$1"
+	if [ -z $1 ]; then
+		echo -e "Usage: activate <virtualenv_dir_name>"
+		return 0
 	fi
+
+	virtualenv_dir="$1"
 	
-	current_dir=$(pwd)
-	
-	if [ -d "bin" ] && ! [ -z "$(ls bin | grep activate)" ]; then
+	original_dir=$(pwd)
+	current_dir="$original_dir"
+
+	if [ -d "$virtualenv_dir/bin" ] && ! [ -z "$(ls "$virtualenv_dir/bin" | grep activate)" ]; then
 		found=true
 	else
 		found=false
@@ -97,17 +112,17 @@ function activate() {
 	while ! $found && [ "$current_dir" != "$HOME" ] && [ "$current_dir" != "/" ]; do
 		cd ..
 		current_dir=$(pwd)
-		echo "$current_dir"
-		if [ -d "bin" ] && ! [ -z "$(ls bin | grep activate)" ]; then
+		echo "$current_dir/$virtualenv_dir"
+		if [ -d "$virtualenv_dir/bin" ] && ! [ -z "$(ls "$virtualenv_dir/bin" | grep activate)" ]; then
 			found=true
 		fi
 	done
 	
 	if $found; then
-		source bin/activate
-		echo "Activated in virtualenv $current_dir"
+		source "$virtualenv_dir/bin/activate"
+		echo "Virtualenv activated"
 	else
-		echo "Not in virtualenv"
+		echo "Virtualenv $virtualenv_dir not found"
 	fi
 	
 	cd "$original_dir"
