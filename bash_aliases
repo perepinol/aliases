@@ -57,6 +57,26 @@ function gpf() {
     echo "Push to $branch (FORCED)"
     git push origin "$branch" --force
 }
+function gsquash() {
+    if [ -z "$1" ]; then
+            echo "Please provide a commit message for squashed commit."
+            return
+    fi
+    if [ -n "$(git status -s)" ]; then
+            echo "Working tree is not clean! Commit then squash."
+            return
+    fi
+    if [ "$(git log master..HEAD | wc -l)" -ne "$(git log master...HEAD | wc -l)" ]; then
+            echo "Master has diverged! Rebase and squash again."
+            return
+    fi
+    
+    messages=$(git log master..HEAD --format=%B | awk '/^\* .+/{print $0} /^\*?[[:alnum:]]+/{print "* "$0}')
+    
+    git reset master --soft
+    git add -A
+    git commit -m "$1" -m "$messages"
+}
 
 # ************************* virtualenv aliases *************************
 
