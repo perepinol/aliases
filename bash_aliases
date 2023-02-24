@@ -71,7 +71,7 @@ function gsquash() {
             return
     fi
     
-    messages=$(git log master..HEAD --format=%B | awk '/^\* .+/{print $0} /^\*?[[:alnum:]]+/{print "* "$0}')
+    messages=$(git log master..HEAD --format=%B | awk '/^\\\* .+/{print $0} /^\\\*?[[:alnum:]]+/{print "* "$0}')
     
     git reset master --soft
     git add -A
