@@ -48,14 +48,14 @@ alias gc='git commit -m'
 alias gca='git commit --amend --no-edit'
 alias gsum='git summary'
 function gp() {
-    branch=$(git branch | awk '/^\\\*/ {print \$2}')
+    branch=$(git branch --show-current)
     echo "Push to $branch"
     git push origin "$branch"
 }
 function gpf() {
-    branch=$(git branch | awk '/^\\\*/ {print \$2}')
+    branch=$(git branch --show-current)
     echo "Push to $branch (FORCED)"
-    git push origin "$branch" --force
+    git push origin "$branch" --force "$@"
 }
 function gsquash() {
     if [ -z "$1" ]; then
@@ -76,6 +76,20 @@ function gsquash() {
     git reset master --soft
     git add -A
     git commit -m "$1" -m "$messages"
+}
+function gprune() {
+    for remote in $(git remote); do
+        git remote prune "$remote"
+    done
+    for branch in $(git branch | grep -vE "\\\* .*"); do
+        remote=$(git branch --remote | grep $branch)
+        if [ -n "$remote" ]; then continue; fi
+        if [ "$1" == "-f" ]; then
+            git branch -D "$branch"
+        else
+            git branch -d "$branch"
+        fi
+    done
 }
 
 # ************************* virtualenv aliases *************************
