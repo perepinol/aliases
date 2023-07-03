@@ -50,7 +50,7 @@ alias gsum='git summary'
 function gp() {
     branch=$(git branch --show-current)
     echo "Push to $branch"
-    git push origin "$branch"
+    git push origin "$branch" "$@"
 }
 function gpf() {
     branch=$(git branch --show-current)
