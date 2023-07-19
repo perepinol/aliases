@@ -82,7 +82,7 @@ function gprune() {
         git remote prune "$remote"
     done
     for branch in $(git branch | grep -vE "\\\* .*"); do
-        remote=$(git branch --remote | grep $branch)
+        remote=$(git branch --remote | grep "$branch\\\$")
         if [ -n "$remote" ]; then continue; fi
         if [ "$1" == "-f" ]; then
             git branch -D "$branch"
