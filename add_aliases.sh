@@ -6,4 +6,5 @@ if [ -f "git_aliases.sh" ]; then
 fi
 if [ -f "bash_aliases.sh" ]; then
     cp bash_aliases.sh ~/.bash_aliases
+    . ~/.bash_aliases
 fi
