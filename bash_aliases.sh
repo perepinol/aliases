@@ -136,30 +136,47 @@ alias ga='git add'
 alias gc='git commit -m'
 alias gca='git commit --amend --no-edit'
 alias gsum='git summary'
+
 function gp() {
     branch=$(git branch --show-current)
     echo "Push to $branch"
     git push origin "$branch" "$@"
 }
+
 function gpf() {
     branch=$(git branch --show-current)
     echo "Push to $branch (FORCED)"
     git push origin "$branch" --force "$@"
 }
+
+# Runs "git remote prune" for all remotes,
+# removes refs that are fully merged,
+# then interactively asks about removing local refs that have no remote counterpart
 function gprune() {
+    function check_merged_commits() {
+        branch_messages="$(git log "$1" ^main --format=%s 2> /dev/null)" || return 1
+        git log main --format=%s | grep "$branch_messages" > /dev/null
+        return $?
+    }
+
     for remote in $(git remote); do
         git remote prune "$remote"
     done
     for branch in $(git branch | grep -vE "\* .*"); do
         remote=$(git branch --remote | grep "$branch\$")
-        if [ -n "$remote" ]; then continue; fi
-        if [ "$1" == "-f" ]; then
-            git branch -D "$branch"
-        else
-            git branch -d "$branch"
-        fi
+        [ -n "$remote" ] && continue
+        git branch -d "$branch" > /dev/null 2>&1 && echo "Deleted branch $branch" && continue
+
+        status="data might be lost"
+        check_merged_commits "$branch" && status="all commits present in main"
+
+        echo "Force delete $branch? ($status) [y/N]"
+        read response
+        [ "$response" == "y" ] && git branch -D "$branch"
     done
 }
+
+# Sets upstream branch to the remote branch with the same name as the checked-out one
 function gtrack() {
     remote=$(git remote)
     [ "$(echo $remote | wc -w)" -ne 1 ] && echo "Found several remotes: $remote" && exit 1
