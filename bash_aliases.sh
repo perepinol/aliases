@@ -56,9 +56,21 @@ function beep() {
     echo -en '\007'
 }
 
+# Makes multiple beep sounds with a different pattern depending on the first parameter
+function bell() {
+    for i in {1..3}; do
+        beep
+        if [ -n "$1" ] && [ "$1" -ne 0 ]; then
+            sleep 0.1
+            beep
+        fi
+        sleep 0.2
+    done
+}
+
 # Runs a command and beeps when it is done
 function bgrun() {
-    (eval $*; beep) &
+    (eval $*; bell $?) &
 }
 
 # Watches an existing process by name or PID and makes a sound when it finishes
@@ -96,12 +108,11 @@ function bgattach() {
                 done
                 read result
                 ! [[ "$result" =~ ^[0-9]+$ ]] || [ "$result" -lt 1 -o "$result" -gt $argcount ] && echo "Invalid value $result" 1>&2 && return 1
-                echo "$((result - 1))"
+                args=($*)
+                echo "${args[$((result - 1))]}"
             }
 
-            index=$(select_option "$names") || return 1
-            pid_array=($pid)
-            pid=${pid_array[$index]}
+            pid=$(select_option "$names") || return 1
         fi
     fi
 
@@ -148,6 +159,12 @@ function gprune() {
             git branch -d "$branch"
         fi
     done
+}
+function gtrack() {
+    remote=$(git remote)
+    [ "$(echo $remote | wc -w)" -ne 1 ] && echo "Found several remotes: $remote" && exit 1
+    branch=$(git branch --show-current)
+    git branch --set-upstream-to=$remote/$branch $branch
 }
 
 # ************************* virtualenv aliases *************************
