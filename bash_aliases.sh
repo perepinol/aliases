@@ -11,15 +11,11 @@ alias d='docker'
 alias dc='docker-compose'
 alias k='kubectl'
 
-# Prints the given line number from stdin, or a variable if given. Also used in these scripts as a helper
+# Prints the given line number from stdin
 function line() {
     [ -z "$1" ] && echo "Usage: line <line_number>" && return 1
 
-    if [ -z "$2" ]; then
-        head -n "$1" | tail -n +"$1"
-    else
-        echo "$2" | head -n "$1" | tail -n +"$1"
-    fi
+    head -n "$1" | tail -n +"$1"
 }
 
 # Finds a command with the given contents in the history
@@ -97,15 +93,10 @@ function bgattach() {
         names=$(echo "$pid_names" | tail -n +2 | sed 's/ //') # Each command and its args on a different line
         pid="$pids"
         if [ "$(echo $pid | wc -w)" -gt 1 ]; then
-
             # Outputs the parameters to the user as options, and returns the index of the chosen one
             function select_option() {
                 echo "Several options available. Please choose one:" 1>&2
-                argcount=$(echo "$*" | wc -l)
-                for i in $(seq $argcount); do
-                    text=$(line $i "$*")
-                    echo "[$i] $text" 1>&2
-                done
+                printf '%s\n' "$*" | awk '{print "["FNR"]", $1}' 1>&2
                 read result
                 ! [[ "$result" =~ ^[0-9]+$ ]] || [ "$result" -lt 1 -o "$result" -gt $argcount ] && echo "Invalid value $result" 1>&2 && return 1
                 args=($*)
@@ -154,23 +145,19 @@ function gpf() {
 # then interactively asks about removing local refs that have no remote counterpart
 function gprune() {
     function check_merged_commits() {
-        branch_messages="$(git log "$1" ^main --format=%s 2> /dev/null)" || return 1
-        git log main --format=%s | grep "$branch_messages" > /dev/null
-        return $?
+        branch_messages="$(git log "$1" ^origin/main --format=%s -- 2> /dev/null)" || return 1
+        git log origin/main --format=%s | grep -q "$branch_messages"
     }
 
-    for remote in $(git remote); do
-        git remote prune "$remote"
-    done
-    for branch in $(git branch | grep -vE "\* .*"); do
-        remote=$(git branch --remote | grep "$branch\$")
-        [ -n "$remote" ] && continue
+    git remote | xargs git remote prune
+    for branch in $(git branch | grep -vE "^\*"); do
+        git branch --remote | grep -q "$branch\$" && continue
         git branch -d "$branch" > /dev/null 2>&1 && echo "Deleted branch $branch" && continue
 
         status="data might be lost"
         check_merged_commits "$branch" && status="all commits present in main"
 
-        echo "Force delete $branch? ($status) [y/N]"
+        printf "Force delete %s? (%s) [y/N] " "$branch" "$status"
         read response
         [ "$response" == "y" ] && git branch -D "$branch"
     done
