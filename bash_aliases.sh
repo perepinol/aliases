@@ -7,9 +7,6 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias h='history'
-alias d='docker'
-alias dc='docker-compose'
-alias k='kubectl'
 
 # Prints the given line number from stdin
 function line() {
@@ -111,7 +108,7 @@ function bgattach() {
 
     function poll() {
         while true; do
-            if ! ps -p $pid &> /dev/null; then break; fi
+            ps -p $pid &> /dev/null || break
             sleep 5
         done
     }
@@ -131,7 +128,8 @@ alias gsum='git summary'
 function gp() {
     branch=$(git branch --show-current)
 
-    echo "Push to $branch ($@)"
+    [ -n "$@" ] && params=" ($@)"
+    printf "Push to $branch$params"
     git push origin "$branch" "$@"
 }
 
