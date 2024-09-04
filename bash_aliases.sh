@@ -128,21 +128,22 @@ alias gsum='git summary'
 function gp() {
     branch=$(git branch --show-current)
 
-    [ -n "$@" ] && params=" ($@)"
-    printf "Push to $branch$params"
+    # Cannot use -n because the params might start with dash
+    [ $(echo "$@" | wc -c) -gt 0 ] && params=" ($@)"
+    printf "Push to $branch$params\n"
     git push origin "$branch" "$@"
 }
 
 function gpnv() {
-    gp --no-verify
+    gp --no-verify "$@"
 }
 
 function gpf() {
-    gp --force
+    gp --force "$@"
 }
 
 function gpfnv() {
-    gp --force --no-verify
+    gp --force --no-verify "$@"
 }
 
 # Runs "git remote prune" for all remotes,
